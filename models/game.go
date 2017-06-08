@@ -1,95 +1,62 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/boltdb/bolt"
+	"github.com/astaxie/beego/orm"
 )
 
-//Game ...
+//Game
 //bee generate model game -fields="id:int,created_at:datetime,ended:bool,point:int"
 type Game struct {
-	Id        int
-	CreatedAt time.Time
+	Id        int64
+	CreatedAt time.Time `orm:"type(datetime);auto_now)"`
 	Ended     bool
 	Point     int
 }
 
 // AddGame insert a new Game into database and returns
 // last inserted Id on success.
-func AddGame(g *Game) error {
-	return DB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("games"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-
-		gameBytes, err := json.Marshal(g)
-		if err != nil {
-			return nil
-		}
-
-		return b.Put(itob(g.Id), gameBytes)
-	})
+func AddGame(m *Game) (id int64, err error) {
+	o := orm.NewOrm()
+	id, err = o.Insert(m)
+	return
 }
 
 // GetGameById retrieves Game by Id. Returns error if
 // Id doesn't exist
-func GetGameById(id int) (*Game, error) {
-	game := &Game{}
-	err := DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("sentences"))
-		if b == nil {
-			return nil
-		}
-		bytes := b.Get(itob(id))
-
-		return json.Unmarshal(bytes, game)
-	})
-	return game, err
+func GetGameById(id int64) (v *Game, err error) {
+	o := orm.NewOrm()
+	v = &Game{Id: id}
+	if err = o.Read(v); err == nil {
+		return v, nil
+	}
+	return nil, err
 }
 
 // GetAllGame retrieves all Game matches certain condition. Returns empty list if
 // no records exist
 func GetAllGame() ([]Game, error) {
-	games := []Game{}
-	err := DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("games"))
-		if b == nil {
-			return nil
-		}
-		b.ForEach(func(k, v []byte) error {
-			game := &Game{}
-			if err := json.Unmarshal(v, game); err != nil {
-				return err
-			}
-			games = append(games, *game)
-			return nil
-		})
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Game))
 
-	return games, nil
+	var l []Game
+	_, err := qs.All(&l)
+	return nil, err
 }
 
-// UpdateGameById ...
-func UpdateGameById(m *Game) error {
-	return DB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("sentences"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
+// UpdateGame updates Game by Id and returns error if
+// the record to be updated doesn't exist
+func UpdateGameById(m *Game) (err error) {
+	o := orm.NewOrm()
+	v := Game{Id: m.Id}
+	// ascertain id exists in the database
+	if err = o.Read(&v); err == nil {
+		var num int64
+		if num, err = o.Update(m); err == nil {
+			fmt.Println("Number of records updated in database:", num)
 		}
-
-		bytes, err := json.Marshal(&m)
-		if err != nil {
-			return err
-		}
-
-		return b.Put(itob(m.Id), bytes)
-	})
+	}
+	return
 }

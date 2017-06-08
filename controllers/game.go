@@ -32,7 +32,7 @@ func (c *GameController) URLMapping() {
 func (c *GameController) Post() {
 	var v models.Game
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.AddGame(&v); err == nil {
+	if _, err := models.AddGame(&v); err == nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = v
 	} else {
@@ -51,7 +51,7 @@ func (c *GameController) Post() {
 func (c *GameController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v, err := models.GetGameById(int(id))
+	v, err := models.GetGameById(id)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
@@ -84,7 +84,7 @@ func (c *GameController) GetAll() {
 func (c *GameController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Game{Id: int(id)}
+	v := models.Game{Id: id}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err := models.UpdateGameById(&v); err == nil {
 		c.Data["json"] = "OK"

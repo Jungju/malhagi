@@ -5,6 +5,8 @@ import (
 
 	"github.com/jungju/malhagi/models"
 
+	"strconv"
+
 	"github.com/astaxie/beego"
 )
 
@@ -31,7 +33,7 @@ func (c *SentenceController) URLMapping() {
 func (c *SentenceController) Post() {
 	var v models.Sentence
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.AddSentence(&v); err == nil {
+	if _, err := models.AddSentence(&v); err == nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = v
 	} else {
@@ -72,7 +74,13 @@ func (c *SentenceController) GetAll() {
 // @router /:id [put]
 func (c *SentenceController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
-	v := models.Sentence{Verb: idStr}
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
+	}
+	v := models.Sentence{Id: id}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err := models.UpdateSentenceById(&v); err == nil {
 		c.Data["json"] = "OK"
@@ -91,7 +99,13 @@ func (c *SentenceController) Put() {
 // @router /:id [delete]
 func (c *SentenceController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
-	if err := models.DeleteSentence(idStr); err == nil {
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
+	}
+	if err := models.DeleteSentence(id); err == nil {
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = err.Error()
