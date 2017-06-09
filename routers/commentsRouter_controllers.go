@@ -34,7 +34,7 @@ func init() {
 	beego.GlobalControllerRouter["github.com/jungju/malhagi/controllers:GameController"] = append(beego.GlobalControllerRouter["github.com/jungju/malhagi/controllers:GameController"],
 		beego.ControllerComments{
 			Method: "Put",
-			Router: `/:id`,
+			Router: `/:id/end`,
 			AllowHTTPMethods: []string{"put"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -50,7 +50,7 @@ func init() {
 	beego.GlobalControllerRouter["github.com/jungju/malhagi/controllers:PlayController"] = append(beego.GlobalControllerRouter["github.com/jungju/malhagi/controllers:PlayController"],
 		beego.ControllerComments{
 			Method: "GetOne",
-			Router: `/:id`,
+			Router: `/start`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})

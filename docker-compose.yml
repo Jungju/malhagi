@@ -1,0 +1,19 @@
+redis:
+  image: redis:latest
+  command: redis-server --requirepass jjgo
+  ports:
+    - "6379:6379"
+db:
+  container_name: db-container
+  image: mysql:latest
+  environment:
+    MYSQL_ROOT_PASSWORD: "jjgo"
+    MYSQL_DATABASE: "mhg"
+    MYSQL_USER: "jjgo"
+    MYSQL_PASSWORD: "jjgo"
+    TZ: "Asia/Seoul"
+  ports:
+    - "3306:3306"
+  command: [mysqld]
+  volumes:
+    - /etc/localtime:/etc/localtime
