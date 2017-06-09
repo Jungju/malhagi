@@ -61,8 +61,13 @@ func TestGamePut(t *testing.T) {
 }
 
 func TestGamePlay(t *testing.T) {
-	gameBodyBytes := reqTest("POST", "/game", nil, 201, "", false)
-	game := models.Game{}
+	game := models.Game{
+		TensesTypes:  10,
+		FormatsTypes: 3,
+		VerbsTypes:   3,
+		PersonsTypes: 5,
+	}
+	gameBodyBytes := reqTest("POST", "/game", &game, 201, "", false)
 	json.Unmarshal(gameBodyBytes, &game)
 	gameID := game.Id
 

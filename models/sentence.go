@@ -104,16 +104,16 @@ func GetRandomSentence(game *Game) *Sentence {
 
 	filterdSentences := []*Sentence{}
 	for _, sentence := range allSentence {
-		if game.FormatsType != formats.None && sentence.FormatsType != game.FormatsType {
+		if !game.CheckFormatsType(sentence.FormatsType) {
 			continue
 		}
-		if game.VerbsType != verbs.None && sentence.VerbsType != game.VerbsType {
+		if !game.CheckVerbType(sentence.VerbsType) {
 			continue
 		}
-		if game.PersonsType != persons.None && sentence.PersonsType != game.PersonsType {
+		if !game.CheckPersonsType(sentence.PersonsType) {
 			continue
 		}
-		if game.TensesType != tenses.None && sentence.TensesType != game.TensesType {
+		if !game.CheckTensesType(sentence.TensesType) {
 			continue
 		}
 		filterdSentences = append(filterdSentences, &sentence)

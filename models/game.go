@@ -13,14 +13,34 @@ import (
 //Game
 //bee generate model game -fields="id:int,created_at:datetime,ended:bool,point:int"
 type Game struct {
-	Id          int64
-	CreatedAt   time.Time `orm:"type(datetime);auto_now"`
-	Ended       bool
-	Point       int
-	VerbsType   verbs.Type
-	PersonsType persons.Type
-	FormatsType formats.Type
-	TensesType  tenses.Type
+	Id           int64
+	CreatedAt    time.Time `orm:"type(datetime);auto_now"`
+	Ended        bool
+	Point        int
+	VerbsTypes   int
+	PersonsTypes int
+	FormatsTypes int
+	TensesTypes  int
+}
+
+//CheckVerbType ...
+func (m Game) CheckVerbType(t verbs.Type) bool {
+	return m.VerbsTypes == 0 || m.VerbsTypes&int(t) == int(t)
+}
+
+//CheckPersonsType ...
+func (m Game) CheckPersonsType(t persons.Type) bool {
+	return m.PersonsTypes == 0 || m.PersonsTypes&int(t) == int(t)
+}
+
+//CheckFormatsType ...
+func (m Game) CheckFormatsType(t formats.Type) bool {
+	return m.FormatsTypes == 0 || m.FormatsTypes&int(t) == int(t)
+}
+
+//CheckTensesType ...
+func (m Game) CheckTensesType(t tenses.Type) bool {
+	return m.TensesTypes == 0 || m.TensesTypes&int(t) == int(t)
 }
 
 //ValidCreate ...

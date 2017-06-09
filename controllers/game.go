@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/jungju/malhagi/models"
@@ -22,10 +23,13 @@ type GameController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *GameController) Post() {
-	game := &models.Game{
-		Ended: false,
-		Point: 0,
+	game := &models.Game{}
+	beego.Trace(string(c.Ctx.Input.RequestBody))
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, game); err != nil {
+		// c.CustomAbort(400, "Json 포멧이 아님")
 	}
+	game.Ended = false
+	game.Point = 0
 	if _, err := models.AddGame(game); err == nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = game

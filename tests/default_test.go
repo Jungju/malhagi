@@ -14,7 +14,6 @@ import (
 	_ "github.com/jungju/malhagi/routers"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -28,7 +27,6 @@ func init() {
 	apppath, _ := filepath.Abs(filepath.Dir(filepath.Join(file, ".."+string(filepath.Separator))))
 	beego.TestBeegoInit(apppath)
 	models.InitDB()
-	orm.Debug = true
 }
 
 func reqTest(method string, url string, body interface{}, expectedCode int, token string, testing bool) []byte {
