@@ -93,7 +93,7 @@ func TestGamePlay(t *testing.T) {
 		})
 		Convey("문제 풀기 답 아님", func() {
 			bodyBytes := reqTest("POST", fmt.Sprintf("/game/%d/play", gameID), models.Play{
-				SentenceID: sentenceID,
+				SentenceId: sentenceID,
 				Input:      "xxxx",
 			}, 201, "", true)
 			play := models.Play{}
@@ -103,7 +103,7 @@ func TestGamePlay(t *testing.T) {
 		})
 		Convey("문제 풀기 답 맞음", func() {
 			bodyBytes := reqTest("POST", fmt.Sprintf("/game/%d/play", gameID), models.Play{
-				SentenceID: sentenceID,
+				SentenceId: sentenceID,
 				Input:      "I study",
 			}, 201, "", true)
 			play := models.Play{}

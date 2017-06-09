@@ -45,7 +45,7 @@ func (c *PlayController) Post() {
 		c.CustomAbort(400, "Game이 이미 끝났습니다.")
 	}
 
-	sentence, err := models.GetSentenceById(v.SentenceID)
+	sentence, err := models.GetSentenceById(v.SentenceId)
 	if err != nil {
 		c.CustomAbort(400, "문제가 잘못되었습니다.")
 	}
