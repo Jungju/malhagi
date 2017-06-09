@@ -75,7 +75,7 @@ func TestGamePlay(t *testing.T) {
 		Text:        "I study",
 		Korean:      "나는 공부한다",
 		TensesType:  tenses.Present,
-		VerbsType:   verbs.GeneralVerb,
+		VerbsType:   verbs.General,
 		PersonsType: persons.I,
 		FormatsType: formats.Plain,
 	}, 201, "", false)

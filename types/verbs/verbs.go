@@ -8,8 +8,8 @@ type Type int
 // const
 const (
 	None Type = iota
-	BeVerb
-	GeneralVerb
+	Be
+	General
 )
 
 func (t Type) String() string {

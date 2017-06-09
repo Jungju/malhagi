@@ -30,7 +30,7 @@ func TestSentencePost(t *testing.T) {
 			reqTest("POST", "/sentence", models.Sentence{
 				Korean:      "나는 잔다",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 400, "", true)
@@ -45,7 +45,7 @@ func TestSentencePost(t *testing.T) {
 				Text:        "I am sleep",
 				Korean:      "나는 잔다",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 201, "", true)
@@ -61,7 +61,7 @@ func TestSentencePost(t *testing.T) {
 				Text:        "I am sleep",
 				Korean:      "나는 잔다2",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 409, "", true)
@@ -76,7 +76,7 @@ func TestSentencePut(t *testing.T) {
 				Text:        "",
 				Korean:      "나는 잔다2",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 400, "", true)
@@ -85,7 +85,7 @@ func TestSentencePut(t *testing.T) {
 				Text:        "I am sleep.2",
 				Korean:      "나는 잔다2",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 404, "", true)
@@ -96,7 +96,7 @@ func TestSentencePut(t *testing.T) {
 				Text:        "I am sleep.2",
 				Korean:      "나는 잔다2",
 				TensesType:  tenses.Present,
-				VerbsType:   verbs.BeVerb,
+				VerbsType:   verbs.Be,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
 			}, 204, "", true)

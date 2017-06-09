@@ -9,15 +9,15 @@ import (
 
 var (
 	_TypeNameToValue = map[string]Type{
-		"None":        None,
-		"BeVerb":      BeVerb,
-		"GeneralVerb": GeneralVerb,
+		"None":    None,
+		"Be":      Be,
+		"General": General,
 	}
 
 	_TypeValueToName = map[Type]string{
-		None:        "None",
-		BeVerb:      "BeVerb",
-		GeneralVerb: "GeneralVerb",
+		None:    "None",
+		Be:      "Be",
+		General: "General",
 	}
 )
 
@@ -25,9 +25,9 @@ func init() {
 	var v Type
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
 		_TypeNameToValue = map[string]Type{
-			interface{}(None).(fmt.Stringer).String():        None,
-			interface{}(BeVerb).(fmt.Stringer).String():      BeVerb,
-			interface{}(GeneralVerb).(fmt.Stringer).String(): GeneralVerb,
+			interface{}(None).(fmt.Stringer).String():    None,
+			interface{}(Be).(fmt.Stringer).String():      Be,
+			interface{}(General).(fmt.Stringer).String(): General,
 		}
 	}
 }
