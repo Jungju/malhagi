@@ -13,14 +13,14 @@ import (
 //Game
 //bee generate model game -fields="id:int,created_at:datetime,ended:bool,point:int"
 type Game struct {
-	Id           int64
-	CreatedAt    time.Time `orm:"type(datetime);auto_now"`
-	Ended        bool
-	Point        int
-	VerbsTypes   int
-	PersonsTypes int
-	FormatsTypes int
-	TensesTypes  int
+	Id           int64     `json:"id"`
+	CreatedAt    time.Time `json:"created_at" orm:"type(datetime);auto_now"`
+	Ended        bool      `json:"ended"`
+	Point        int       `json:"point"`
+	VerbsTypes   int       `json:"verbsTypes"`
+	PersonsTypes int       `json:"personsTypes"`
+	FormatsTypes int       `json:"formatsTypes"`
+	TensesTypes  int       `json:"tensesTypes"`
 }
 
 //CheckVerbType ...

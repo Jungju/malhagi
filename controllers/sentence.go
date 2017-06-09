@@ -36,7 +36,7 @@ func (c *SentenceController) Post() {
 	_, err := models.GetSentenceByText(v.Text)
 	if err != nil {
 		if err != orm.ErrNoRows {
-			c.CustomAbort(500, "Error System")
+			c.CustomAbort(500, "문장을 가져오는중 알수없는 에러")
 		}
 	} else {
 		c.CustomAbort(409, "이미 영어가 입력되어 있음")
@@ -46,7 +46,7 @@ func (c *SentenceController) Post() {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = v
 	} else {
-		c.CustomAbort(500, "Error System")
+		c.CustomAbort(500, "DB에 추가 중 알수없는 에러")
 	}
 	c.ServeJSON()
 }

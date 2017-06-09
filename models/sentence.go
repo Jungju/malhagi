@@ -16,14 +16,14 @@ var GlobalSentence []Sentence
 //Sentence ...
 //bee generate model sentence -fields="id:int,created_at:datetime,text:string,korean:string,verbs_type:int,persons_type:int,formats_type:int,tenses_type:int"
 type Sentence struct {
-	Id          int64
-	CreatedAt   time.Time `orm:"type(datetime);auto_now"`
-	Text        string    `orm:"size(128)"`
-	Korean      string    `orm:"size(128)"`
-	VerbsType   verbs.Type
-	PersonsType persons.Type
-	FormatsType formats.Type
-	TensesType  tenses.Type
+	Id          int64        `json:"id"`
+	CreatedAt   time.Time    `json:"created_at" orm:"type(datetime);auto_now"`
+	Text        string       `json:"text",orm:"size(128)"`
+	Korean      string       `json:"korean",orm:"size(128)"`
+	VerbsType   verbs.Type   `json:"verbsType"`
+	PersonsType persons.Type `json:"personsType"`
+	FormatsType formats.Type `json:"formatsType"`
+	TensesType  tenses.Type  `json:"tensesType"`
 }
 
 //ValidCreate ...
