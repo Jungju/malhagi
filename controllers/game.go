@@ -25,9 +25,7 @@ type GameController struct {
 func (c *GameController) Post() {
 	game := &models.Game{}
 	beego.Trace(string(c.Ctx.Input.RequestBody))
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, game); err != nil {
-		// c.CustomAbort(400, "Json 포멧이 아님")
-	}
+	json.Unmarshal(c.Ctx.Input.RequestBody, game)
 	game.Ended = false
 	game.Point = 0
 	if _, err := models.AddGame(game); err == nil {
@@ -48,7 +46,10 @@ func (c *GameController) Post() {
 // @router /:id [get]
 func (c *GameController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
+	id, err := strconv.ParseInt(idStr, 0, 64)
+	if err != nil {
+		c.CustomAbort(400, "ID가 숫자이어야 합니다")
+	}
 	v, err := models.GetGameById(id)
 	if err != nil {
 		c.Data["json"] = err.Error()

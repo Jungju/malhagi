@@ -18,8 +18,8 @@ var GlobalSentence []Sentence
 type Sentence struct {
 	Id          int64        `json:"id"`
 	CreatedAt   time.Time    `json:"created_at" orm:"type(datetime);auto_now"`
-	Text        string       `json:"text",orm:"size(128)"`
-	Korean      string       `json:"korean",orm:"size(128)"`
+	Text        string       `json:"text,omitempty",orm:"size(128)"`
+	Korean      string       `json:"korean,omitempty",orm:"size(128)"`
 	VerbsType   verbs.Type   `json:"verbsType"`
 	PersonsType persons.Type `json:"personsType"`
 	FormatsType formats.Type `json:"formatsType"`
