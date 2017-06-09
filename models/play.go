@@ -9,12 +9,12 @@ import (
 //Play
 //bee generate model Play -fields="id:int,created_at:datetime,ended:bool,point:int"
 type Play struct {
-	Id         int64
-	CreatedAt  time.Time `orm:"type(datetime);auto_now"`
-	SentenceID int64
-	GameId     int64
-	Input      string
-	IsSuccess  bool
+	Id         int64     `json:"id"`
+	CreatedAt  time.Time `json:"created_at" orm:"type(datetime);auto_now"`
+	SentenceId int64     `json:"sentenceId"`
+	GameId     int64     `json:"gameId"`
+	Input      string    `json:"input"`
+	IsSuccess  bool      `json:"isSuccess"`
 }
 
 //ValidCreate ...
