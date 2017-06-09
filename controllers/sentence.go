@@ -8,19 +8,12 @@ import (
 	"strconv"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 // SentenceController operations for Sentence
 type SentenceController struct {
 	beego.Controller
-}
-
-// URLMapping ...
-func (c *SentenceController) URLMapping() {
-	c.Mapping("Post", c.Post)
-	c.Mapping("GetAll", c.GetAll)
-	c.Mapping("Put", c.Put)
-	c.Mapping("Delete", c.Delete)
 }
 
 // Post ...
@@ -32,12 +25,28 @@ func (c *SentenceController) URLMapping() {
 // @router / [post]
 func (c *SentenceController) Post() {
 	var v models.Sentence
-	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
+		c.CustomAbort(400, "Json 포멧이 아님")
+	}
+
+	if !v.ValidCreate() {
+		c.CustomAbort(400, "누락된 정보가 있습니다.")
+	}
+
+	_, err := models.GetSentenceByText(v.Text)
+	if err != nil {
+		if err != orm.ErrNoRows {
+			c.CustomAbort(500, "Error System")
+		}
+	} else {
+		c.CustomAbort(409, "이미 영어가 입력되어 있음")
+	}
+
 	if _, err := models.AddSentence(&v); err == nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = v
 	} else {
-		c.Data["json"] = err.Error()
+		c.CustomAbort(500, "Error System")
 	}
 	c.ServeJSON()
 }
@@ -45,22 +54,17 @@ func (c *SentenceController) Post() {
 // GetAll ...
 // @Title Get All
 // @Description get Sentence
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Sentence
 // @Failure 403
 // @router / [get]
 func (c *SentenceController) GetAll() {
 	l, err := models.GetAllSentence()
 	if err != nil {
-		c.Data["json"] = err.Error()
+		c.CustomAbort(500, "Error System")
 	} else {
 		c.Data["json"] = l
 	}
+
 	c.ServeJSON()
 }
 
@@ -73,21 +77,27 @@ func (c *SentenceController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *SentenceController) Put() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	v := models.Sentence{}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
+		c.CustomAbort(400, "Json이 잘못되었습니다.")
+	}
+
+	if !v.ValidUpdate() {
+		c.CustomAbort(400, "누락된 정보가 있습니다.")
+	}
+
+	_, err := models.GetSentenceById(v.Id)
 	if err != nil {
-		c.Data["json"] = err.Error()
-		c.ServeJSON()
-		return
+		if err == orm.ErrNoRows {
+			c.CustomAbort(404, "문장이 없습니다.")
+		}
+		c.CustomAbort(500, "Error System")
 	}
-	v := models.Sentence{Id: id}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.UpdateSentenceById(&v); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
+
+	if err := models.UpdateSentence(&v); err != nil {
+		c.CustomAbort(500, "Error System")
 	}
-	c.ServeJSON()
+	c.Ctx.Output.SetStatus(204)
 }
 
 // Delete ...
@@ -101,14 +111,19 @@ func (c *SentenceController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		c.Data["json"] = err.Error()
-		c.ServeJSON()
-		return
+		c.CustomAbort(400, "ID가 없습니다.")
 	}
-	if err := models.DeleteSentence(id); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
+
+	_, err = models.GetSentenceById(id)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			c.CustomAbort(404, "문장이 없습니다.")
+		}
+		c.CustomAbort(500, "Error System")
 	}
-	c.ServeJSON()
+
+	if err := models.DeleteSentence(id); err != nil {
+		c.CustomAbort(500, "Error System")
+	}
+	c.Ctx.Output.SetStatus(204)
 }

@@ -1,25 +1,17 @@
 package controllers
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/jungju/malhagi/models"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 // GameController operations for Game
 type GameController struct {
 	beego.Controller
-}
-
-// URLMapping ...
-func (c *GameController) URLMapping() {
-	c.Mapping("Post", c.Post)
-	c.Mapping("GetOne", c.GetOne)
-	c.Mapping("GetAll", c.GetAll)
-	c.Mapping("Put", c.Put)
 }
 
 // Post ...
@@ -30,13 +22,15 @@ func (c *GameController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *GameController) Post() {
-	var v models.Game
-	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if _, err := models.AddGame(&v); err == nil {
+	game := &models.Game{
+		Ended: false,
+		Point: 0,
+	}
+	if _, err := models.AddGame(game); err == nil {
 		c.Ctx.Output.SetStatus(201)
-		c.Data["json"] = v
+		c.Data["json"] = game
 	} else {
-		c.Data["json"] = err.Error()
+		c.CustomAbort(500, "Error System")
 	}
 	c.ServeJSON()
 }
@@ -64,9 +58,9 @@ func (c *GameController) GetOne() {
 // @Title Get All
 // @router / [get]
 func (c *GameController) GetAll() {
-	l, err := models.GetAllGame()
+	l, err := models.GetAllSentence()
 	if err != nil {
-		c.Data["json"] = err.Error()
+		c.CustomAbort(500, "Error System")
 	} else {
 		c.Data["json"] = l
 	}
@@ -80,16 +74,29 @@ func (c *GameController) GetAll() {
 // @Param	body		body 	models.Game	true		"body for Game content"
 // @Success 200 {object} models.Game
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router /:id/end [put]
 func (c *GameController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Game{Id: id}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.UpdateGameById(&v); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
+	game, err := models.GetGameById(id)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			c.CustomAbort(404, "게임이 없습니다.")
+		}
+		c.CustomAbort(500, "Error System")
 	}
+
+	game.Ended = true
+	if cnt, err := models.GetPlaySuccessCountByGameID(id); err == nil {
+		game.Point = cnt
+	} else {
+		c.CustomAbort(500, "Error System")
+	}
+
+	if err := models.UpdateGame(game); err != nil {
+		c.CustomAbort(500, "Error System")
+	}
+	c.Ctx.Output.SetStatus(200)
+	c.Data["json"] = game
 	c.ServeJSON()
 }

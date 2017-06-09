@@ -1,10 +1,6 @@
 package test
 
 import (
-	"bytes"
-	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -28,45 +24,110 @@ func init() {
 	beego.TestBeegoInit(apppath)
 }
 
-// TestGet is a sample to run an endpoint test
 func TestSentencePost(t *testing.T) {
 	Convey("단어 만들기", t, func() {
-		Convey("단어 만들기 성공", func() {
+		Convey("단어 만들기 실패", func() {
 			reqTest("POST", "/sentence", models.Sentence{
-				Text:        "I am sleep.",
 				Korean:      "나는 잔다",
 				TensesType:  tenses.Present,
 				VerbsType:   verbs.BeVerb,
 				PersonsType: persons.I,
 				FormatsType: formats.Plain,
-			}, 201, "")
+			}, 400, "", true)
 		})
-		Convey("단어 확인", func() {
-			bodyBytes := reqTest("GET", "/sentence", nil, 200, "")
+		Convey("단어 만들기 성공", func() {
+			bodyBytes := reqTest("GET", "/sentence", nil, 200, "", true)
 			sentences := []models.Sentence{}
 			err := json.Unmarshal(bodyBytes, &sentences)
+			cnt := len(sentences)
+
+			reqTest("POST", "/sentence", models.Sentence{
+				Text:        "I am sleep",
+				Korean:      "나는 잔다",
+				TensesType:  tenses.Present,
+				VerbsType:   verbs.BeVerb,
+				PersonsType: persons.I,
+				FormatsType: formats.Plain,
+			}, 201, "", true)
+
+			nextBodyBytes := reqTest("GET", "/sentence", nil, 200, "", true)
+			nextSentences := []models.Sentence{}
+			err = json.Unmarshal(nextBodyBytes, &nextSentences)
 			So(err, ShouldBeNil)
-			So(len(sentences), ShouldEqual, 1)
+			So(len(nextSentences), ShouldEqual, cnt+1)
+		})
+		Convey("중복된 단어는 안됨", func() {
+			reqTest("POST", "/sentence", models.Sentence{
+				Text:        "I am sleep",
+				Korean:      "나는 잔다2",
+				TensesType:  tenses.Present,
+				VerbsType:   verbs.BeVerb,
+				PersonsType: persons.I,
+				FormatsType: formats.Plain,
+			}, 409, "", true)
 		})
 	})
 }
 
-func reqTest(method string, url string, body interface{}, expectedCode int, token string) []byte {
-	bodyBytes, _ := json.Marshal(body)
-	r, _ := http.NewRequest(method, fmt.Sprintf("/%s%s", APIVersion, url), bytes.NewBuffer(bodyBytes))
-	if token != "" {
-		r.Header.Add("X-Auth-Token", token)
-	}
-	w := httptest.NewRecorder()
-	beego.BeeApp.Handlers.ServeHTTP(w, r)
-	beego.Trace("BODY : %s", w.Body.String())
-	So(w.Code, ShouldEqual, expectedCode)
+func TestSentencePut(t *testing.T) {
+	Convey("단어 수정하기", t, func() {
+		Convey("단어 수정하기 실패", func() {
+			reqTest("PUT", "/sentence/1", models.Sentence{
+				Text:        "",
+				Korean:      "나는 잔다2",
+				TensesType:  tenses.Present,
+				VerbsType:   verbs.BeVerb,
+				PersonsType: persons.I,
+				FormatsType: formats.Plain,
+			}, 400, "", true)
+			reqTest("PUT", "/sentence/10", models.Sentence{
+				Id:          10,
+				Text:        "I am sleep.2",
+				Korean:      "나는 잔다2",
+				TensesType:  tenses.Present,
+				VerbsType:   verbs.BeVerb,
+				PersonsType: persons.I,
+				FormatsType: formats.Plain,
+			}, 404, "", true)
+		})
+		Convey("단어 수정하기 성공", func() {
+			reqTest("PUT", "/sentence/1", models.Sentence{
+				Id:          1,
+				Text:        "I am sleep.2",
+				Korean:      "나는 잔다2",
+				TensesType:  tenses.Present,
+				VerbsType:   verbs.BeVerb,
+				PersonsType: persons.I,
+				FormatsType: formats.Plain,
+			}, 204, "", true)
 
-	return w.Body.Bytes()
+			bodyBytes := reqTest("GET", "/sentence", nil, 200, "", true)
+			sentences := []models.Sentence{}
+			err := json.Unmarshal(bodyBytes, &sentences)
+			So(err, ShouldBeNil)
+			So(sentences[0].Text, ShouldEqual, "I am sleep.2")
+		})
+	})
 }
 
-//TODO: 단어 리스트
+func TestSentenceDelete(t *testing.T) {
+	Convey("단어 삭제하기", t, func() {
+		Convey("단어 삭제하기 실패", func() {
+			reqTest("DELETE", "/sentence/10", nil, 404, "", true)
+		})
+		Convey("단어 삭제하기 성공", func() {
+			bodyBytes := reqTest("GET", "/sentence", nil, 200, "", true)
+			sentences := []models.Sentence{}
+			err := json.Unmarshal(bodyBytes, &sentences)
+			cnt := len(sentences)
 
-//TODO: 단어 수정
+			reqTest("DELETE", "/sentence/1", nil, 204, "", true)
 
-//TODO: 단어 삭제
+			nextBodyBytes := reqTest("GET", "/sentence", nil, 200, "", true)
+			nextSentences := []models.Sentence{}
+			err = json.Unmarshal(nextBodyBytes, &nextSentences)
+			So(err, ShouldBeNil)
+			So(len(nextSentences), ShouldEqual, cnt-1)
+		})
+	})
+}

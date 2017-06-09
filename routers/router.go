@@ -24,6 +24,11 @@ func init() {
 			beego.NSInclude(
 				&controllers.GameController{},
 			),
+			beego.NSNamespace("/:gameID/play",
+				beego.NSInclude(
+					&controllers.PlayController{},
+				),
+			),
 		),
 	)
 	beego.AddNamespace(ns)

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -11,11 +11,13 @@ import (
 	"github.com/jungju/malhagi/types/verbs"
 )
 
+var GlobalSentence []Sentence
+
 //Sentence ...
 //bee generate model sentence -fields="id:int,created_at:datetime,text:string,korean:string,verbs_type:int,persons_type:int,formats_type:int,tenses_type:int"
 type Sentence struct {
 	Id          int64
-	CreatedAt   time.Time `orm:"type(datetime);auto_now)"`
+	CreatedAt   time.Time `orm:"type(datetime);auto_now"`
 	Text        string    `orm:"size(128)"`
 	Korean      string    `orm:"size(128)"`
 	VerbsType   verbs.Type
@@ -24,62 +26,102 @@ type Sentence struct {
 	TensesType  tenses.Type
 }
 
-// AddSentence insert a new Sentence into database and returns
-// last inserted Id on success.
-func AddSentence(m *Sentence) (id int64, err error) {
-	o := orm.NewOrm()
-	id, err = o.Insert(m)
-	return
-}
-
-// GetSentenceById retrieves Sentence by Id. Returns error if
-// Id doesn't exist
-func GetSentenceById(id int64) (v *Sentence, err error) {
-	o := orm.NewOrm()
-	v = &Sentence{Id: id}
-	if err = o.Read(v); err == nil {
-		return v, nil
+//ValidCreate ...
+func (m Sentence) ValidCreate() bool {
+	if m.Text == "" || m.Korean == "" {
+		return false
 	}
-	return nil, err
+	return true
 }
 
-// GetAllSentence retrieves all Sentence matches certain condition. Returns empty list if
-// no records exist
+//ValidUpdate ...
+func (m Sentence) ValidUpdate() bool {
+	if m.Id <= 0 {
+		return false
+	}
+	if m.Text == "" || m.Korean == "" {
+		return false
+	}
+	return true
+}
+
+// AddSentence ...
+func AddSentence(m *Sentence) (int64, error) {
+	o := orm.NewOrm()
+	return o.Insert(m)
+}
+
+// GetSentenceById ...
+func GetSentenceById(id int64) (*Sentence, error) {
+	o := orm.NewOrm()
+	v := &Sentence{Id: id}
+	err := o.Read(v)
+	return v, err
+}
+
+// GetSentenceByText ...
+func GetSentenceByText(text string) (*Sentence, error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Sentence))
+	qs = qs.Filter("text", text)
+
+	sentence := &Sentence{}
+	err := qs.One(sentence)
+	return sentence, err
+}
+
+// GetAllSentence ...
 func GetAllSentence() ([]Sentence, error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Sentence))
-
+	qs = qs.Limit(500)
 	var l []Sentence
 	_, err := qs.All(&l)
 	return l, err
 }
 
-// UpdateSentence updates Sentence by Id and returns error if
-// the record to be updated doesn't exist
-func UpdateSentenceById(m *Sentence) (err error) {
+// UpdateSentence ...
+func UpdateSentence(m *Sentence) error {
 	o := orm.NewOrm()
-	v := Sentence{Id: m.Id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
+	_, err := o.Update(m)
+	return err
 }
 
-// DeleteSentence deletes Sentence by Id and returns error if
-// the record to be deleted doesn't exist
-func DeleteSentence(id int64) (err error) {
+// DeleteSentence ...
+func DeleteSentence(id int64) error {
 	o := orm.NewOrm()
-	v := Sentence{Id: id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Delete(&Sentence{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
-		}
+	_, err := o.Delete(&Sentence{Id: id})
+	return err
+}
+
+// GetRandomSentence ...
+func GetRandomSentence(game *Game) *Sentence {
+	if GlobalSentence == nil && len(GlobalSentence) == 0 {
+		GlobalSentence, _ = GetAllSentence()
 	}
-	return
+
+	allSentence := GlobalSentence
+
+	filterdSentences := []*Sentence{}
+	for _, sentence := range allSentence {
+		if game.FormatsType != formats.None && sentence.FormatsType != game.FormatsType {
+			continue
+		}
+		if game.VerbsType != verbs.None && sentence.VerbsType != game.VerbsType {
+			continue
+		}
+		if game.PersonsType != persons.None && sentence.PersonsType != game.PersonsType {
+			continue
+		}
+		if game.TensesType != tenses.None && sentence.TensesType != game.TensesType {
+			continue
+		}
+		filterdSentences = append(filterdSentences, &sentence)
+	}
+
+	if len(filterdSentences) == 0 {
+		return nil
+	}
+
+	return filterdSentences[rand.Intn(len(filterdSentences))]
 }

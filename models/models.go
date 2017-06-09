@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"bitbucket.org/jungju/ahg/envs"
+	"github.com/jungju/malhagi/envs"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -19,6 +19,7 @@ func InitDB() error {
 	orm.RegisterModel(
 		new(Sentence),
 		new(Game),
+		new(Play),
 	)
 
 	return orm.RunSyncdb("default", true, true)

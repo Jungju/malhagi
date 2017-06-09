@@ -1,0 +1,109 @@
+{
+	"ImportPath": "github.com/jungju/malhagi",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/astaxie/beego",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/config",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/context",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/context/param",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/grace",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/logs",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/orm",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/session",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/toolbox",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/astaxie/beego/utils",
+			"Comment": "v1.8.3",
+			"Rev": "cab8458c1c4a5a3b4bf5192922be620e6dede15b"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-125-gd512f20",
+			"Rev": "d512f204a577a4ab037a1816604c48c9c13210be"
+		},
+		{
+			"ImportPath": "github.com/gopherjs/gopherjs/js",
+			"Rev": "6997325cc76f13635f68ad9e1c38544966eb7de2"
+		},
+		{
+			"ImportPath": "github.com/jonboulle/clockwork",
+			"Comment": "v0.1.0-4-gbcac988",
+			"Rev": "bcac9884e7502bb2b474c0339d889cb981a2f27f"
+		},
+		{
+			"ImportPath": "github.com/jtolds/gls",
+			"Comment": "v4.2.0-2-g77f1821",
+			"Rev": "77f18212c9c7edc9bd6a33d383a7b545ce62f064"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions",
+			"Comment": "1.6.0-26-g8d53f03",
+			"Rev": "8d53f0381cdc56c7e0f06f4995d21cd04c5a53a8"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/go-render/render",
+			"Comment": "1.6.0-26-g8d53f03",
+			"Rev": "8d53f0381cdc56c7e0f06f4995d21cd04c5a53a8"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/oglematchers",
+			"Comment": "1.6.0-26-g8d53f03",
+			"Rev": "8d53f0381cdc56c7e0f06f4995d21cd04c5a53a8"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/gotest",
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/reporting",
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+		}
+	]
+}

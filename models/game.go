@@ -1,62 +1,66 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/astaxie/beego/orm"
+	"github.com/jungju/malhagi/types/formats"
+	"github.com/jungju/malhagi/types/persons"
+	"github.com/jungju/malhagi/types/tenses"
+	"github.com/jungju/malhagi/types/verbs"
 )
 
 //Game
 //bee generate model game -fields="id:int,created_at:datetime,ended:bool,point:int"
 type Game struct {
-	Id        int64
-	CreatedAt time.Time `orm:"type(datetime);auto_now)"`
-	Ended     bool
-	Point     int
+	Id          int64
+	CreatedAt   time.Time `orm:"type(datetime);auto_now"`
+	Ended       bool
+	Point       int
+	VerbsType   verbs.Type
+	PersonsType persons.Type
+	FormatsType formats.Type
+	TensesType  tenses.Type
 }
 
-// AddGame insert a new Game into database and returns
-// last inserted Id on success.
-func AddGame(m *Game) (id int64, err error) {
+//ValidCreate ...
+func (m Game) ValidCreate() bool {
+	return true
+}
+
+//ValidUpdate ...
+func (m Game) ValidUpdate() bool {
+	return true
+}
+
+// AddGame ...
+func AddGame(m *Game) (int64, error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
-	return
+	return o.Insert(m)
 }
 
-// GetGameById retrieves Game by Id. Returns error if
-// Id doesn't exist
-func GetGameById(id int64) (v *Game, err error) {
+// GetGameById ...
+func GetGameById(id int64) (*Game, error) {
 	o := orm.NewOrm()
-	v = &Game{Id: id}
-	if err = o.Read(v); err == nil {
-		return v, nil
-	}
-	return nil, err
+	v := &Game{Id: id}
+	err := o.Read(v)
+	return v, err
 }
 
-// GetAllGame retrieves all Game matches certain condition. Returns empty list if
-// no records exist
+// GetAllGame ...
 func GetAllGame() ([]Game, error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Game))
-
+	qs = qs.OrderBy("-point")
+	qs = qs.Limit(100)
 	var l []Game
 	_, err := qs.All(&l)
-	return nil, err
+	return l, err
 }
 
-// UpdateGame updates Game by Id and returns error if
-// the record to be updated doesn't exist
-func UpdateGameById(m *Game) (err error) {
+// UpdateGame
+func UpdateGame(m *Game) error {
 	o := orm.NewOrm()
-	v := Game{Id: m.Id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
+	_, err := o.Update(m)
+	return err
 }
