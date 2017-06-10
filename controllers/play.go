@@ -45,13 +45,13 @@ func (c *PlayController) Post() {
 		c.CustomAbort(400, "Game이 이미 끝났습니다.")
 	}
 
+	if game.CreatedAt.Add(time.Minute).After(time.Now()) {
+		c.CustomAbort(400, "Game이 이미 끝났습니다.")
+	}
+
 	sentence, err := models.GetSentenceById(v.SentenceId)
 	if err != nil {
 		c.CustomAbort(400, "문제가 잘못되었습니다.")
-	}
-
-	if game.CreatedAt.Add(time.Minute).After(time.Now()) {
-		c.CustomAbort(400, "Game이 이미 끝났습니다.")
 	}
 
 	v.GameId = game.Id
@@ -88,12 +88,12 @@ func (c *PlayController) GetOne() {
 		c.CustomAbort(400, "Game이 이미 끝났습니다.")
 	}
 
-	sentence := models.GetRandomSentence(game)
-	if sentence == nil {
-		c.CustomAbort(500, "문제가 없습니다.")
+	sentence, err := models.GetRandomSentence(game)
+	if err != nil {
+		c.CustomAbort(500, "준비된 문제가 없습니다.")
 	}
 
-	sentence.Text = ""
+	//sentence.Text = ""
 	c.Data["json"] = sentence
 	c.ServeJSON()
 }

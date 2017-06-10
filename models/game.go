@@ -3,6 +3,8 @@ package models
 import (
 	"time"
 
+	"strings"
+
 	"github.com/astaxie/beego/orm"
 	"github.com/jungju/malhagi/types/formats"
 	"github.com/jungju/malhagi/types/persons"
@@ -17,30 +19,100 @@ type Game struct {
 	CreatedAt    time.Time `json:"created_at" orm:"type(datetime);auto_now"`
 	Ended        bool      `json:"ended"`
 	Point        int       `json:"point"`
-	VerbsTypes   int       `json:"verbsTypes"`
-	PersonsTypes int       `json:"personsTypes"`
-	FormatsTypes int       `json:"formatsTypes"`
-	TensesTypes  int       `json:"tensesTypes"`
+	VerbsTypes   string    `json:"verbsTypes"`
+	PersonsTypes string    `json:"personsTypes"`
+	FormatsTypes string    `json:"formatsTypes"`
+	TensesTypes  string    `json:"tensesTypes"`
 }
 
-//CheckVerbType ...
-func (m Game) CheckVerbType(t verbs.Type) bool {
-	return m.VerbsTypes == 0 || m.VerbsTypes&int(t) == int(t)
+//GetAllVerbTypeIds ...
+func (m Game) GetAllVerbTypeIds() []int {
+	if m.VerbsTypes == "" {
+		return verbs.Ids()
+	}
+
+	ids := []int{}
+	types := strings.Split(m.VerbsTypes, ",")
+	for _, stringType := range types {
+		if verbs.Be.String() == stringType {
+			ids = append(ids, int(verbs.Be))
+		} else if verbs.General.String() == stringType {
+			ids = append(ids, int(verbs.Be))
+		}
+	}
+	return ids
 }
 
-//CheckPersonsType ...
-func (m Game) CheckPersonsType(t persons.Type) bool {
-	return m.PersonsTypes == 0 || m.PersonsTypes&int(t) == int(t)
+//GetAllFormatTypeIds ...
+func (m Game) GetAllFormatTypeIds() []int {
+	if m.FormatsTypes == "" {
+		return formats.Ids()
+	}
+
+	ids := []int{}
+	types := strings.Split(m.FormatsTypes, ",")
+	for _, stringType := range types {
+		if formats.Plain.String() == stringType {
+			ids = append(ids, int(formats.Plain))
+		} else if formats.Future.String() == stringType {
+			ids = append(ids, int(formats.Future))
+		} else if formats.Question.String() == stringType {
+			ids = append(ids, int(formats.Question))
+		} else if formats.Negative.String() == stringType {
+			ids = append(ids, int(formats.Negative))
+		}
+	}
+	return ids
 }
 
-//CheckFormatsType ...
-func (m Game) CheckFormatsType(t formats.Type) bool {
-	return m.FormatsTypes == 0 || m.FormatsTypes&int(t) == int(t)
+//GetAllTensesTypeIds ...
+func (m Game) GetAllTensesTypeIds() []int {
+	if m.TensesTypes == "" {
+		return tenses.Ids()
+	}
+
+	ids := []int{}
+	types := strings.Split(m.TensesTypes, ",")
+	for _, stringType := range types {
+		if tenses.Past.String() == stringType {
+			ids = append(ids, int(tenses.Past))
+		} else if tenses.Present.String() == stringType {
+			ids = append(ids, int(tenses.Present))
+		} else if tenses.Future.String() == stringType {
+			ids = append(ids, int(tenses.Future))
+		}
+	}
+	return ids
 }
 
-//CheckTensesType ...
-func (m Game) CheckTensesType(t tenses.Type) bool {
-	return m.TensesTypes == 0 || m.TensesTypes&int(t) == int(t)
+//GetAllPersonsTypeIds ...
+func (m Game) GetAllPersonsTypeIds() []int {
+	if m.PersonsTypes == "" {
+		return persons.Ids()
+	}
+
+	ids := []int{}
+	types := strings.Split(m.PersonsTypes, ",")
+	for _, stringType := range types {
+		if persons.I.String() == stringType {
+			ids = append(ids, int(persons.I))
+		} else if persons.We.String() == stringType {
+			ids = append(ids, int(persons.We))
+		} else if persons.You.String() == stringType {
+			ids = append(ids, int(persons.You))
+		} else if persons.They.String() == stringType {
+			ids = append(ids, int(persons.They))
+		} else if persons.He.String() == stringType {
+			ids = append(ids, int(persons.He))
+		} else if persons.She.String() == stringType {
+			ids = append(ids, int(persons.She))
+		} else if persons.It.String() == stringType {
+			ids = append(ids, int(persons.It))
+		} else if persons.Special.String() == stringType {
+			ids = append(ids, int(persons.Special))
+		}
+	}
+	return ids
 }
 
 //ValidCreate ...

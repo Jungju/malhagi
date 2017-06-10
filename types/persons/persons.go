@@ -21,3 +21,17 @@ const (
 func (t Type) String() string {
 	return strings.ToLower(_TypeValueToName[t])
 }
+
+//Ids ...
+func Ids() []int {
+	return []int{
+		int(I),
+		int(We),
+		int(You),
+		int(They),
+		int(He),
+		int(She),
+		int(It),
+		int(Special),
+	}
+}

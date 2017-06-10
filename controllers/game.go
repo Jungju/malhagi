@@ -24,7 +24,6 @@ type GameController struct {
 // @router / [post]
 func (c *GameController) Post() {
 	game := &models.Game{}
-	beego.Trace(string(c.Ctx.Input.RequestBody))
 	json.Unmarshal(c.Ctx.Input.RequestBody, game)
 	game.Ended = false
 	game.Point = 0

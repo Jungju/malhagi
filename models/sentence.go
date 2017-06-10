@@ -4,14 +4,18 @@ import (
 	"math/rand"
 	"time"
 
+	"fmt"
+
+	"strings"
+
+	"errors"
+
 	"github.com/astaxie/beego/orm"
 	"github.com/jungju/malhagi/types/formats"
 	"github.com/jungju/malhagi/types/persons"
 	"github.com/jungju/malhagi/types/tenses"
 	"github.com/jungju/malhagi/types/verbs"
 )
-
-var GlobalSentence []Sentence
 
 //Sentence ...
 //bee generate model sentence -fields="id:int,created_at:datetime,text:string,korean:string,verbs_type:int,persons_type:int,formats_type:int,tenses_type:int"
@@ -29,6 +33,12 @@ type Sentence struct {
 //ValidCreate ...
 func (m Sentence) ValidCreate() bool {
 	if m.Text == "" || m.Korean == "" {
+		return false
+	}
+	if m.FormatsType == formats.None ||
+		m.TensesType == tenses.None ||
+		m.PersonsType == persons.None ||
+		m.VerbsType == verbs.None {
 		return false
 	}
 	return true
@@ -95,33 +105,32 @@ func DeleteSentence(id int64) error {
 }
 
 // GetRandomSentence ...
-func GetRandomSentence(game *Game) *Sentence {
-	if GlobalSentence == nil && len(GlobalSentence) == 0 {
-		GlobalSentence, _ = GetAllSentence()
+func GetRandomSentence(game *Game) (*Sentence, error) {
+	o := orm.NewOrm()
+	var sentences []Sentence
+	sql := "SELECT sentence.* FROM sentence WHERE 1=1 "
+	sql += fmt.Sprintf("AND verbs_type IN (%s) ", intArrayJoin(game.GetAllVerbTypeIds()))
+	sql += fmt.Sprintf("AND formats_type IN (%s) ", intArrayJoin(game.GetAllFormatTypeIds()))
+	sql += fmt.Sprintf("AND tenses_type IN (%s) ", intArrayJoin(game.GetAllTensesTypeIds()))
+	sql += fmt.Sprintf("AND persons_type IN (%s) ", intArrayJoin(game.GetAllPersonsTypeIds()))
+	sql += fmt.Sprintf("AND sentence.id NOT IN (SELECT sentence_id FROM play WHERE game_id = %d) ", game.Id)
+	_, err := o.Raw(sql).QueryRows(&sentences)
+	if err != nil {
+		return nil, err
 	}
 
-	allSentence := GlobalSentence
-
-	filterdSentences := []*Sentence{}
-	for _, sentence := range allSentence {
-		if !game.CheckFormatsType(sentence.FormatsType) {
-			continue
-		}
-		if !game.CheckVerbType(sentence.VerbsType) {
-			continue
-		}
-		if !game.CheckPersonsType(sentence.PersonsType) {
-			continue
-		}
-		if !game.CheckTensesType(sentence.TensesType) {
-			continue
-		}
-		filterdSentences = append(filterdSentences, &sentence)
+	if len(sentences) == 0 {
+		return nil, errors.New("준비 된 문제 없음")
 	}
+	sentence := sentences[rand.Intn(len(sentences))]
 
-	if len(filterdSentences) == 0 {
-		return nil
+	return &sentence, err
+}
+
+func intArrayJoin(integers []int) string {
+	strArrat := []string{}
+	for _, i := range integers {
+		strArrat = append(strArrat, fmt.Sprintf("%d", i))
 	}
-
-	return filterdSentences[rand.Intn(len(filterdSentences))]
+	return strings.Join(strArrat, ",")
 }

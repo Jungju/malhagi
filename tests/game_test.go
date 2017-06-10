@@ -62,10 +62,10 @@ func TestGamePut(t *testing.T) {
 
 func TestGamePlay(t *testing.T) {
 	game := models.Game{
-		TensesTypes:  10,
-		FormatsTypes: 3,
-		VerbsTypes:   3,
-		PersonsTypes: 5,
+	// TensesTypes:  "past",
+	// FormatsTypes: "plain",
+	// VerbsTypes:   "be",
+	// PersonsTypes: "i",
 	}
 	gameBodyBytes := reqTest("POST", "/game", &game, 201, "", false)
 	json.Unmarshal(gameBodyBytes, &game)
@@ -83,7 +83,8 @@ func TestGamePlay(t *testing.T) {
 	json.Unmarshal(sentenceBytes, &sentence)
 	sentenceID := sentence.Id
 
-	Convey("문제 받기", t, func() {
+	Convey("문제 풀기", t, func() {
+		//TODO: 문제 받고 풀기로 변경
 		Convey("문제 받기 성공", func() {
 			bodyBytes := reqTest("GET", fmt.Sprintf("/game/%d/play/start", gameID), nil, 200, "", true)
 			sentence := models.Sentence{}
@@ -111,6 +112,9 @@ func TestGamePlay(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(play.IsSuccess, ShouldEqual, true)
 		})
+		Convey("문제가 없어 문제 받기 실패", func() {
+			reqTest("GET", fmt.Sprintf("/game/%d/play/start", gameID), nil, 500, "", true)
+		})
 		Convey("문제 풀기 끝", func() {
 			bodyBytes := reqTest("PUT", fmt.Sprintf("/game/%d/end", gameID), nil, 200, "", true)
 			game := models.Game{}
@@ -119,8 +123,80 @@ func TestGamePlay(t *testing.T) {
 			So(game.Ended, ShouldEqual, true)
 			So(game.Point, ShouldEqual, 1)
 		})
-		Convey("시간 제한으로 문제 받기 실패", func() {
+		Convey("게임 종료로 문제 받기 실패", func() {
+			reqTest("GET", fmt.Sprintf("/game/%d/play/start", gameID), nil, 400, "", true)
+		})
+	})
+}
 
+func TestGamePlay2(t *testing.T) {
+
+	reqTest("POST", "/sentence", models.Sentence{
+		Text:        "I study3",
+		Korean:      "나는 공부한다3",
+		TensesType:  tenses.Past,
+		VerbsType:   verbs.General,
+		PersonsType: persons.I,
+		FormatsType: formats.Plain,
+	}, 201, "", false)
+
+	reqTest("POST", "/sentence", models.Sentence{
+		Text:        "I study4",
+		Korean:      "나는 공부한다4",
+		TensesType:  tenses.Past,
+		VerbsType:   verbs.General,
+		PersonsType: persons.I,
+		FormatsType: formats.Plain,
+	}, 201, "", false)
+
+	game := models.Game{
+		TensesTypes:  "past",
+		FormatsTypes: "",
+		VerbsTypes:   "",
+		PersonsTypes: "",
+	}
+	gameBodyBytes := reqTest("POST", "/game", &game, 201, "", false)
+	json.Unmarshal(gameBodyBytes, &game)
+	gameID := game.Id
+
+	Convey("문제 받고 풀기", t, func() {
+		Convey("문제 받고 풀기 2번", func() {
+			bodyBytes := reqTest("GET", fmt.Sprintf("/game/%d/play/start", gameID), nil, 200, "", true)
+			sentence := models.Sentence{}
+			err := json.Unmarshal(bodyBytes, &sentence)
+			So(err, ShouldBeNil)
+			So(sentence.Id, ShouldBeGreaterThan, 0)
+
+			bodyBytes = reqTest("POST", fmt.Sprintf("/game/%d/play", gameID), models.Play{
+				SentenceId: sentence.Id,
+				Input:      sentence.Text,
+			}, 201, "", true)
+			play := models.Play{}
+			err = json.Unmarshal(bodyBytes, &play)
+			So(err, ShouldBeNil)
+			So(play.IsSuccess, ShouldEqual, true)
+
+			bodyBytes = reqTest("GET", fmt.Sprintf("/game/%d/play/start", gameID), nil, 200, "", true)
+			sentence = models.Sentence{}
+			err = json.Unmarshal(bodyBytes, &sentence)
+			So(err, ShouldBeNil)
+			So(sentence.Id, ShouldBeGreaterThan, 0)
+
+			bodyBytes = reqTest("POST", fmt.Sprintf("/game/%d/play", gameID), models.Play{
+				SentenceId: sentence.Id,
+				Input:      sentence.Text,
+			}, 201, "", true)
+			play = models.Play{}
+			err = json.Unmarshal(bodyBytes, &play)
+			So(err, ShouldBeNil)
+			So(play.IsSuccess, ShouldEqual, true)
+
+			bodyBytes = reqTest("PUT", fmt.Sprintf("/game/%d/end", gameID), nil, 200, "", true)
+			game := models.Game{}
+			err = json.Unmarshal(bodyBytes, &game)
+			So(err, ShouldBeNil)
+			So(game.Ended, ShouldEqual, true)
+			So(game.Point, ShouldEqual, 2)
 		})
 	})
 }
