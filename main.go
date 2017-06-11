@@ -16,5 +16,6 @@ func main() {
 	if err := models.InitDB(); err != nil {
 		panic(err)
 	}
+
 	beego.Run()
 }

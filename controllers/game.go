@@ -10,6 +10,10 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+func (c GameController) Prepare() {
+	c.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
+}
+
 // GameController operations for Game
 type GameController struct {
 	beego.Controller

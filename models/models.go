@@ -21,5 +21,5 @@ func InitDB() error {
 		new(Play),
 	)
 
-	return orm.RunSyncdb("default", true, true)
+	return orm.RunSyncdb("default", false, false)
 }

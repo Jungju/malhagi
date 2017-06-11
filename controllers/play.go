@@ -12,6 +12,10 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+func (c PlayController) Prepare() {
+	c.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
+}
+
 // PlayController operations for Play
 type PlayController struct {
 	beego.Controller
