@@ -8,6 +8,8 @@ import (
 
 	"time"
 
+	"strings"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
@@ -55,7 +57,7 @@ func (c *PlayController) Post() {
 	}
 
 	v.GameId = game.Id
-	if v.Input == sentence.Text {
+	if strings.ToLower(v.Input) == strings.ToLower(sentence.Text) {
 		v.IsSuccess = true
 	} else {
 		v.IsSuccess = false
