@@ -14,6 +14,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// Prepare ...
 func (c PlayController) Prepare() {
 	c.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
 }

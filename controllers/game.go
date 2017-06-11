@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// Prepare ...
 func (c GameController) Prepare() {
 	c.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
 }
@@ -55,7 +56,7 @@ func (c *GameController) GetOne() {
 	}
 	v, err := models.GetGameById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		c.CustomAbort(500, err.Error())
 	} else {
 		c.Data["json"] = v
 	}
@@ -66,7 +67,7 @@ func (c *GameController) GetOne() {
 // @Title Get All
 // @router / [get]
 func (c *GameController) GetAll() {
-	l, err := models.GetAllSentence()
+	l, err := models.GetAllGame()
 	if err != nil {
 		c.CustomAbort(500, "Error System")
 	} else {

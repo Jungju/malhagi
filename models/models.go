@@ -5,6 +5,7 @@ import (
 
 	"github.com/jungju/malhagi/envs"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -21,5 +22,5 @@ func InitDB() error {
 		new(Play),
 	)
 
-	return orm.RunSyncdb("default", false, false)
+	return orm.RunSyncdb("default", beego.BConfig.RunMode == "test", false)
 }

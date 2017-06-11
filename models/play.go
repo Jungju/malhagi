@@ -6,8 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-//Play
-//bee generate model Play -fields="id:int,created_at:datetime,ended:bool,point:int"
+// Play ...
 type Play struct {
 	Id         int64     `json:"id"`
 	CreatedAt  time.Time `json:"created_at" orm:"type(datetime);auto_now"`
